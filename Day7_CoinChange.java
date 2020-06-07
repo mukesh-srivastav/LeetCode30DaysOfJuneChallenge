@@ -1,33 +1,46 @@
+/**
+ * You are given coins of different denominations and a total amount of money. Write a function to compute the number of combinations that make up that amount. You may assume that you have infinite number of each kind of coin.
+
+ 
+
+Example 1:
+
+Input: amount = 5, coins = [1, 2, 5]
+Output: 4
+Explanation: there are four ways to make up the amount:
+5=5
+5=2+2+1
+5=2+1+1+1
+5=1+1+1+1+1
+
+DP Table, for each element we check ways if we include this coin + ways if we do not include this coin
+
+   0, 1, 2, 3, 4, 5
+0  1, 0, 0, 0, 0, 0 
+1  1, 1, 1, 1, 1, 1
+2  1, 1, 2, 2, 3, 3 
+3  1, 1, 2, 2, 3, 4 (A[i][j] = a[i-1][j] + (j-coins[i-1]) >= 0) ? a[i][j - coins[i-1]] : 0;
+ */
 public class Day7_CoinChange {
-    public int change(int amount, int[] coins) {
-        int n = coins.length;
+    public int change(int n, int[] coins) {
+        int m = coins.length;
         
-        return count (amount, coins, n);
-    }
-    
-    public int count(int amount, int[] coins, int n) {
-        //Time complexity of this function: O(mn) 
-        //Space Complexity of this function: O(n) 
-  
-        // table[i] will be storing the number of solutions 
-        // for value i. We need n+1 rows as the table is 
-        // constructed in bottom up manner using the base 
-        // case (n = 0) 
-        int[] table = new int[amount+1]; 
-  
-        // Initialize all table values as 0 
-        Arrays.fill(table, 0);   //O(n) 
-  
-        // Base case (If given value is 0) 
-        table[0] = 1; 
-  
-        // Pick all coins one by one and update the table[] 
-        // values after the index greater than or equal to 
-        // the value of the picked coin 
-        for (int i=0; i<n; i++) 
-            for (int j=coins[i]; j<=amount; j++) 
-                table[j] += table[j-coins[i]]; 
-  
-        return table[amount]; 
+        int a[][] = new int[m+1][n+1];
+        
+        // if amount is zero, then for each coin addition, it will be always be 1 unique way. 
+        for (int i=0; i<=m; i++) {
+            a[i][0] = 1;
+        }
+        
+        for (int i=1; i<=m; i++) {
+            for (int j=1; j<=n; j++) {
+                if (j - coins[i-1] >=0)
+                    a[i][j] = a[i-1][j] + a[i][j - coins[i-1]];
+                else
+                    a[i][j] = a[i-1][j];
+            }
+        }
+        
+        return a[m][n];
     }
 }
